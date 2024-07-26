@@ -110,24 +110,24 @@ dkim_output=$(postal default-dkim-record)
 DKIM="$dkim_output"
 
 echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
-
+echo ""
 echo -e "\e[35mPostal 安装\e[0m 设置A记录为： @ $ips"
 
 
-echo -e "\e[35mPostal 安装\e[0m 设置MX记录为：  rp  MX   10   $domain"
-
-echo -e "\e[35mPostal 安装\e[0m 设置MX记录为：  @  MX   10   mx.$domain"
-
-echo -e "\e[35mPostal 安装\e[0m 设置返回MX记录为： routes  MX  10  $domain"
-
-echo -e "\e[35mPostal 安装\e[0m 设置DMARC记录为： _dmarc  TXT  v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
-
-echo -e "\e[35mPostal 安装\e[0m 设置SPF记录为：   rp   TXT  v=spf1 a mx include:spf.$domain ~all"
-
-echo -e "\e[35mPostal 安装\e[0m 设置SPF记录为：   spf  TXT  v=spf1 ip4:$ips  ~all"
-
-echo -e "\e[35mPostal 安装\e[0m 设置CNAM记录为：  psrp.  CNAM  rp.carrofaur.shop"
-
-echo -e "\e[35mPostal 安装\e[0m 设置CNAM记录为：  click.  CNAM  track.carrofaur.shop"
-
-echo -e "\e[35mPostal 安装\e[0m 设置A记录为：  click.  A  $ips"
+echo -e "\e[35mDNS配置\e[0m 设置MX记录为：   \e[32m    rp \e[0m       \e[31m MX   10 \e[0m  $domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置MX记录为：   \e[32m    @ \e[0m        \e[31m MX   10  \e[0m mx.$domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置返回MX记录为：\e[32m routes \e[0m  \e[31m MX  10 e[0m  $domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置DMARC记录为： \e[32m _dmarc \e[0m \e[31m TXT \e[0m  v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置SPF记录为：   \e[32m  rp \e[0m    \e[31m TXT \e[0m  v=spf1 a mx include:spf.$domain ~all"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置SPF记录为：   \e[32m  spf \e[0m    \e[31m TXT \e[0m  v=spf1 ip4:$ips  ~all"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置CNAM记录为：  \e[32m  psrp  \e[0m  \e[31m CNAM \e[0m  rp.carrofaur.shop"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置CNAM记录为：  \e[32m  click \e[0m  \e[31m CNAM \e[0m  track.carrofaur.shop"
+echo ""
+echo -e "\e[35mDNS配置\e[0m 设置A记录为：      \e[32m track \e[0m  \e[31m A \e[0m   $ips"
