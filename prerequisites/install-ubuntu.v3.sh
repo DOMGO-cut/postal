@@ -114,21 +114,21 @@ DKIM="$dkim_output"
 
 echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
 
-echo -e "\e[35mPostal 安装e[0m 你应该设置A记录为： $ips   AAAA记录 $ipss"
+echo -e "\e[35mPostal 安装\e[0m 你应该设置A记录为： $ips   AAAA记录 $ipss"
 
-echo -e "\e[35mPostal 安装e[0m MX记录为：    MX   10   $domain"
+echo -e "\e[35mPostal 安装\e[0m MX记录为：    MX   10   $domain"
 
-echo -e "\e[35mPostal 安装e[0m rp.MX记录为：    MX   10   rp.$domain"
+echo -e "\e[35mPostal 安装\e[0m rp.MX记录为：    MX   10   rp.$domain"
 
-echo -e "\e[35mPostal 安装e[0m 返回MX记录为： routes  MX  10  $domain"
+echo -e "\e[35mPostal 安装\e[0m 返回MX记录为： routes  MX  10  $domain"
 
-echo -e "\e[35mPostal 安装e[0m DMARC记录为： _dmarc  TXT  v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
+echo -e "\e[35mPostal 安装\e[0m DMARC记录为： _dmarc  TXT  v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
 
-echo -e "\e[35mPostal 安装e[0m SPF记录为：   rp   TXT  v=spf1 a mx include:spf.$domain ~all"
+echo -e "\e[35mPostal 安装\e[0m SPF记录为：   rp   TXT  v=spf1 a mx include:spf.$domain ~all"
 
-echo -e "\e[35mPostal 安装e[0m SPF记录为：   spf  TXT  v=spf1 ip4:$ips   ip6:$ipss ~all
+echo -e "\e[35mPostal 安装\e[0m SPF记录为：   spf  TXT  v=spf1 ip4:$ips   ip6:$ipss ~all
 
-echo -e "\e[35mPostal 安装e[0m DKIM记录为：  postal.default._domainkey.rp      $DKIM"
+echo -e "\e[35mPostal 安装\e[0m DKIM记录为：  postal.default._domainkey.rp      $DKIM"
 
-echo -e "\e[35mPostal 安装e[0m 返回MX记录为： routes  MX  10  $domain"
+echo -e "\e[35mPostal 安装\e[0m 返回MX记录为： routes  MX  10  $domain"
 
