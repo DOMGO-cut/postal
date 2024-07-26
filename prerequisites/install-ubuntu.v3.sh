@@ -21,17 +21,17 @@ echo \
   tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt-get update
 
-# Install docker
+# 安装 Docker
 apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Install helper
+# 安装 Postal 辅助工具
 git clone https://github.com/DOMGO-cut/postal.git /opt/postal/install
 ln -s /opt/postal/install/bin/postal /usr/bin/postal
 
 sudo chmod +x /opt/postal/install/bin/postal
 echo "权限已执行完毕"
 
-# Run MariaDB
+# 启动 MariaDB 容器
 docker run -d \
    --name postal-mariadb \
    -p 127.0.0.1:3306:3306 \
@@ -42,6 +42,12 @@ docker run -d \
 
 # 提示用户输入域名
 read -p "请输入你的域名: " domain
+
+# 检查用户是否输入了域名
+if [ -z "$domain" ]; then
+  echo "缺少主机名。"
+  exit 1
+fi
 
 # 运行 postal bootstrap 命令
 postal bootstrap "$domain"
@@ -55,8 +61,9 @@ postal make-user
 echo "数据库初始化完毕"
 
 postal start
-echo "开启postal服务成功"
+echo "开启 postal 服务成功"
 
+# 启动 Caddy 容器
 docker run -d \
    --name postal-caddy \
    --restart always \
@@ -64,5 +71,5 @@ docker run -d \
    -v /opt/postal/config/Caddyfile:/etc/caddy/Caddyfile \
    -v /opt/postal/caddy-data:/data \
    caddy
-   
-echo "安装完成，请打开网址访问postal服务，https://$domain"
+
+echo "安装完成，请打开网址访问 postal 服务，https://$domain"
