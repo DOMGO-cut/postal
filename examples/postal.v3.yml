@@ -2,14 +2,14 @@ version: 2
 
 postal:
   web_hostname: postal.yourdomain.com
-  web_protocol: https
+  web_protocol: http
   smtp_hostname: postal.yourdomain.com
 
 main_db:
   host: 127.0.0.1
-  username: domcsc
+  username: root
   password: hzx19960426
-  database: postal
+  database: domcsc
 
 message_db:
   host: 127.0.0.1
