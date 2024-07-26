@@ -15,7 +15,7 @@ message_db:
   host: 127.0.0.1
   username: root
   password: hzx19960426
-  prefix: domcsc
+  prefix: postal
 
 smtp_server:
   default_bind_address: "::"
