@@ -111,24 +111,23 @@ DKIM="$dkim_output"
 
 echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
 
-echo -e "\e[35mPostal 安装\e[0m 你应该设置A记录  $ips"
-
-echo -e "\e[35mPostal 安装\e[0m MX记录为：  rp  MX   10   $domain"
-
-echo -e "\e[35mPostal 安装\e[0m MX记录为：  mx.  MX   10   mx.$domain"
-
-echo -e "\e[35mPostal 安装\e[0m 返回MX记录为： routes  MX  10  $domain"
-
-echo -e "\e[35mPostal 安装\e[0m DMARC记录为： _dmarc  TXT  v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
-
-echo -e "\e[35mPostal 安装\e[0m SPF记录为：   rp   TXT  v=spf1 a mx include:spf.$domain ~all"
-
-echo -e "\e[35mPostal 安装\e[0m SPF记录为：   spf  TXT  v=spf1 ip4:$ips  ~all"
-
-echo -e "\e[35mPostal 安装\e[0m CNAM记录为：  psrp.  CNAM  rp.carrofaur.shop"
-
-echo -e "\e[35mPostal 安装\e[0m CNAM记录为：  click.  CNAM  track.carrofaur.shop"
-
-echo -e "\e[35mPostal 安装\e[0m DKIM记录为：  postal-SR15CQ._domainkey      $DKIM"
+echo -e "\e[35mPostal 安装\e[0m 设置A记录为： @ $ips"
 
 
+echo -e "\e[35mPostal 安装\e[0m 设置MX记录为：  rp  MX   10   $domain"
+
+echo -e "\e[35mPostal 安装\e[0m 设置MX记录为：  mx.  MX   10   mx.$domain"
+
+echo -e "\e[35mPostal 安装\e[0m 设置返回MX记录为： routes  MX  10  $domain"
+
+echo -e "\e[35mPostal 安装\e[0m 设置DMARC记录为： _dmarc  TXT  v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
+
+echo -e "\e[35mPostal 安装\e[0m 设置SPF记录为：   rp   TXT  v=spf1 a mx include:spf.$domain ~all"
+
+echo -e "\e[35mPostal 安装\e[0m 设置SPF记录为：   spf  TXT  v=spf1 ip4:$ips  ~all"
+
+echo -e "\e[35mPostal 安装\e[0m 设置CNAM记录为：  psrp.  CNAM  rp.carrofaur.shop"
+
+echo -e "\e[35mPostal 安装\e[0m 设置CNAM记录为：  click.  CNAM  track.carrofaur.shop"
+
+echo -e "\e[35mPostal 安装\e[0m 设置A记录为：  click.  A  $ips"
