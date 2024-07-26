@@ -126,6 +126,8 @@ echo -e "\e[35mPostal 安装e[0m DMARC记录为： _dmarc   v=DMARC1;p=quarantin
 
 echo -e "\e[35mPostal 安装e[0m SPF记录为：   spf   v=spf1 a mx include:spf.$domain ~all"
 
+echo -e "\e[35mPostal 安装e[0m SPF记录为：   spf   v=spf1 ip4:$ips   ip6:$ipss ~all
+
 echo -e "\e[35mPostal 安装e[0m DKIM记录为：  default._domainkey.$domain   $DKIM"
 
 echo -e "\e[35mPostal 安装e[0m 返回MX记录为： routes  MX  10  $domain"
