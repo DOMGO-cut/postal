@@ -41,7 +41,7 @@ message_db:
 rabbitmq:
   # Specify connection details for your RabbitMQ server
   host: 127.0.0.1
-  username: domcsc
+  username: domcscs
   password: hzx19960426
   vhost: postal
 
