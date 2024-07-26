@@ -2,8 +2,12 @@
 # Postal web interface.
 postal.yourdomain.com {
   reverse_proxy 127.0.0.1:5000
-   header_up X-Postal-Track-Host 1
+   header_up X-Postal-Track-Host "1"
 }
+
+click.yourdomain.com {
+  reverse_proxy 127.0.0.1:5000 {
+    header_up X-Postal-Track-Host "1"
 
 # If you use open/click tracking you may need to add additional hosts
 # to this file using the format below.
