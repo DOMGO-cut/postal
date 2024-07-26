@@ -27,6 +27,14 @@ fi
 
 # 安装 Postal 助手
 git clone https://postalserver.io/start/install /opt/postal/install
+
+# 检查并删除现有的符号链接
+if [ -L "/usr/bin/postal" ]; then
+    echo "检测到现有的符号链接 /usr/bin/postal，正在删除..."
+    rm /usr/bin/postal
+fi
+
+# 创建新的符号链接
 ln -s /opt/postal/install/bin/postal /usr/bin/postal
 
 # 确保 /usr/bin/postal 是可执行的
