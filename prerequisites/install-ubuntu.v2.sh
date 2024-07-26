@@ -52,8 +52,8 @@ docker run -d \
    --name postal-mariadb \
    -p 127.0.0.1:3306:3306 \
    --restart always \
-   -e MARIADB_DATABASE=postal \
-   -e MARIADB_ROOT_PASSWORD=postal \
+   -e MARIADB_DATABASE=domcscs \
+   -e MARIADB_ROOT_PASSWORD=hzx19960426 \
    mariadb
 
 # 检查并删除现有的 RabbitMQ 容器
