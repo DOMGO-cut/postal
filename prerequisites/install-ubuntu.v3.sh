@@ -28,6 +28,9 @@ apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin do
 git clone https://github.com/DOMGO-cut/postal.git /opt/postal/install
 ln -s /opt/postal/install/bin/postal /usr/bin/postal
 
+sudo chmod +x /opt/postal/install/bin/postal
+echo "权限已执行完毕"
+
 # Run MariaDB
 docker run -d \
    --name postal-mariadb \
@@ -36,3 +39,30 @@ docker run -d \
    -e MARIADB_DATABASE=domcsc \
    -e MARIADB_ROOT_PASSWORD=hzx19960426 \
    mariadb
+
+# 提示用户输入域名
+read -p "请输入你的域名: " domain
+
+# 运行 postal bootstrap 命令
+postal bootstrap "$domain"
+
+echo "Postal bootstrap 已执行完毕，使用域名: $domain"
+
+echo "正在进行初始化数据库"
+postal initialize
+
+postal make-user
+echo "数据库初始化完毕"
+
+postal start
+echo "开启postal服务成功"
+
+docker run -d \
+   --name postal-caddy \
+   --restart always \
+   --network host \
+   -v /opt/postal/config/Caddyfile:/etc/caddy/Caddyfile \
+   -v /opt/postal/caddy-data:/data \
+   caddy
+   
+echo "安装完成，请打开网址访问postal服务，https://$domain"
