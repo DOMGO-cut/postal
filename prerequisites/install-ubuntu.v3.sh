@@ -104,7 +104,7 @@ ipv4=$(curl -s https://api64.ipify.org)
 ips="$ipv4"
 
 echo ""
-echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，\e[31m https://domcsc.$domain \e[0m"
+echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，\e[31m https://$domain \e[0m"
 echo ""
 echo -e "\e[35mPostal 安装\e[0m 设置A记录为： \e[31m   @  \e[0m       \e[31m A  \e[0m    $ips"
 echo ""
