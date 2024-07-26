@@ -94,5 +94,35 @@ docker run -d \
    -v /opt/postal/config/Caddyfile:/etc/caddy/Caddyfile \
    -v /opt/postal/caddy-data:/data \
    caddy
+   
+# 获取当前的 IPv4 地址
+ipv4=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
-echo -e "\e[35mstart\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
+# 获取当前的 IPv6 地址
+ipv6=$(ip -6 addr show | grep -oP '(?<=inet6\s)[\da-fA-F:]+')
+
+# 将结果赋值给变量
+ips="$ipv4"
+ipss="$ipv6"
+
+# 获取默认 DKIM 记录
+dkim_output=$(postal default-dkim-record)
+
+# 提取 DKIM 记录（假设输出格式是纯文本的 DKIM 记录）
+# 如果输出有特定的格式，例如 JSON，你可能需要使用 `jq` 或其他工具来解析
+DKIM="$dkim_output"
+
+echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
+
+echo -e "\e[35mPostal 安装e[0m 你应该设置A记录为： $ips   AAAA记录 $ipss"
+
+echo -e "\e[35mPostal 安装e[0m MX记录为：    MX   10   $domain"
+
+echo -e "\e[35mPostal 安装e[0m DMARC记录为： _dmarc   v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
+
+echo -e "\e[35mPostal 安装e[0m SPF记录为：   spf   v=spf1 ip4:$ips $ipss ~all"
+
+echo -e "\e[35mPostal 安装e[0m DKIM记录为：  default._domainkey.$domain   $DKIM"
+
+echo -e "\e[35mPostal 安装e[0m 返回MX记录为： routes  MX  10  $domain"
+
