@@ -1,12 +1,7 @@
 # Update this to match the hostname you wish to use for accessing the
 # Postal web interface.
 postal.yourdomain.com {
-  respond "This site is under maintenance"
-}
-
-# 子域名配置
-domcsc.postal.yourdomain.com {
-   reverse_proxy 127.0.0.1:5000
+  reverse_proxy 127.0.0.1:5000
 }
 
 click.postal.yourdomain.com {
