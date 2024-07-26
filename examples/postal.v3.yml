@@ -13,7 +13,7 @@ main_db:
 
 message_db:
   host: 127.0.0.1
-  username: domcsc
+  username: root
   password: hzx19960426
   prefix: postal
 
