@@ -116,7 +116,7 @@ echo -e "\e[35mPostal 安装\e[0m 设置A记录为： @ $ips"
 
 echo -e "\e[35mPostal 安装\e[0m 设置MX记录为：  rp  MX   10   $domain"
 
-echo -e "\e[35mPostal 安装\e[0m 设置MX记录为：  mx.  MX   10   mx.$domain"
+echo -e "\e[35mPostal 安装\e[0m 设置MX记录为：  @  MX   10   mx.$domain"
 
 echo -e "\e[35mPostal 安装\e[0m 设置返回MX记录为： routes  MX  10  $domain"
 
