@@ -61,11 +61,12 @@ docker run -d \
    mariadb
 
 # 提示用户输入域名
-read -p "请输入你的域名: " domain
+echo "请输入你的域名（例如: example.com）:"
+read domain
 
 # 检查用户是否输入了域名
 if [ -z "$domain" ]; then
-  echo "缺少主机名。"
+  echo "缺少主机名。请确保输入一个有效的域名。"
   exit 1
 fi
 
