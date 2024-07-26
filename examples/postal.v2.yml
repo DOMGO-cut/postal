@@ -25,22 +25,22 @@ main_db:
   # Specify the connection details for your MySQL database
   host: 127.0.0.1
   username: root
-  password: postal
-  database: postal
+  password: hzx19960426
+  database: domcsc
 
 message_db:
   # Specify the connection details for your MySQL server that will house the
   # message databases for mail servers.
   host: 127.0.0.1
   username: root
-  password: postal
+  password: hzx19960426
   prefix: postal
 
 rabbitmq:
   # Specify connection details for your RabbitMQ server
   host: 127.0.0.1
-  username: postal
-  password: postal
+  username: domcsc
+  password: hzx19960426
   vhost: postal
 
 dns:
@@ -48,9 +48,9 @@ dns:
   # https://docs.postalserver.io/install/dns-configuration for further information
   # about these.
   mx_records:
-    - mx.postal.yourdomain.com
+    - postal.yourdomain.com
   smtp_server_hostname: postal.yourdomain.com
-  spf_include: spf.postal.yourdomain.com
+  spf_include: postal.yourdomain.com
   return_path: rp.postal.yourdomain.com
   route_domain: routes.postal.yourdomain.com
   track_domain: track.postal.yourdomain.com
