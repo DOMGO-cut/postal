@@ -59,7 +59,7 @@ docker run -d \
 # 提示用户输入域名
 echo -e "\e[35mPostal 安装\e[0m 请输入你的域名（例如: example.com）:"
 read domain
-echo ""
+
 # 检查用户是否输入了域名
 if [ -z "$domain" ]; then
   echo -e "\e[35mPostal 安装\e[0m 缺少主机名。请确保输入一个有效的域名。"
