@@ -25,8 +25,8 @@ dns:
 # https://github.com/atech/postal/wiki/Domains-&-DNS-Configuration
 
   mx_records:
-    - postal.yourdomain.com
-  spf_include: postal.yourdomain.com
+    - mx.postal.yourdomain.com
+  spf_include: spf.postal.yourdomain.com
   return_path_domain: rp.postal.yourdomain.com
   route_domain: routes.postal.yourdomain.com
   track_domain: track.postal.yourdomain.com
