@@ -72,3 +72,45 @@ docker run -d \
    -e RABBITMQ_DEFAULT_PASS=postal \
    -e RABBITMQ_DEFAULT_VHOST=postal \
    rabbitmq:3.8
+
+
+# 提示用户输入域名
+echo -e "\e[35mPostal 安装\e[0m 请输入你的域名（例如: example.com）:"
+read domain
+
+# 检查用户是否输入了域名
+if [ -z "$domain" ]; then
+  echo -e "\e[35mPostal 安装\e[0m 缺少主机名。请确保输入一个有效的域名。"
+  exit 1
+fi
+
+# 运行 postal bootstrap 命令
+postal bootstrap "$domain"
+
+echo -e "\e[35mPostal 安装\e[0m Postal bootstrap 已执行完毕，使用域名: $domain"
+
+echo -e "\e[35mPostal 安装\e[0m 正在进行初始化数据库"
+postal initialize
+
+postal make-user
+echo -e "\e[35mPostal 安装\e[0m 数据库初始化完毕"
+
+postal start
+echo -e "\e[35mPostal 安装\e[0m 开启 postal 服务成功"
+
+# 删除现有的 Caddy 容器（如果存在）
+if [ "$(docker ps -aq -f name=postal-caddy)" ]; then
+  echo -e "\e[35mstart\e[0m 现有的 Caddy 容器存在，正在删除..."
+  docker rm -f postal-caddy
+fi
+
+# 启动 Caddy 容器
+docker run -d \
+   --name postal-caddy \
+   --restart always \
+   --network host \
+   -v /opt/postal/config/Caddyfile:/etc/caddy/Caddyfile \
+   -v /opt/postal/caddy-data:/data \
+   caddy
+
+echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
