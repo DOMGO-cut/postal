@@ -1,9 +1,6 @@
 #!/bin/bash
 
 # 此脚本将在 Ubuntu 上安装 Postal 的所有先决条件。
-# 它还将为您启动 MariaDB 容器。
-#
-# 重要提示：如果您将其用于产品，则应确保使用适合您的数据库服务的凭据。
 
 set -e
 
@@ -24,11 +21,25 @@ apt-get update
 # 安装 Docker
 apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# 安装 Postal 辅助工具
-git clone https://github.com/DOMGO-cut/postal.git /opt/postal/install
-ln -s /opt/postal/install/bin/postal /usr/bin/postal
+# 检查并删除现有目录和符号链接
+INSTALL_DIR="/opt/postal/install"
+SYMLINK="/usr/bin/postal"
 
-sudo chmod +x /opt/postal/install/bin/postal
+if [ -d "$INSTALL_DIR" ]; then
+  echo "目标目录 $INSTALL_DIR 已存在，正在删除..."
+  rm -rf "$INSTALL_DIR"
+fi
+
+if [ -L "$SYMLINK" ]; then
+  echo "符号链接 $SYMLINK 已存在，正在删除..."
+  rm "$SYMLINK"
+fi
+
+# 克隆 Postal 仓库
+git clone https://github.com/DOMGO-cut/postal.git "$INSTALL_DIR"
+ln -s "$INSTALL_DIR/bin/postal" "$SYMLINK"
+
+sudo chmod +x "$INSTALL_DIR/bin/postal"
 echo "权限已执行完毕"
 
 # 启动 MariaDB 容器
