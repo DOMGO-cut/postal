@@ -103,7 +103,7 @@ ipv4=$(curl -s https://api64.ipify.org)
 ips="$ipv4"
 
 
-echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
+echo -e "\e[35mPostal 安装\e[0m 安装完成，请打开网址访问 postal 服务，\e[31m https://$domain \e[0m"
 echo ""
 echo -e "\e[35mPostal 安装\e[0m 设置A记录为： @ $ips"
 echo ""
