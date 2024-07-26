@@ -1,0 +1,365 @@
+#!/bin/bash
+
+set -e
+
+# 获取当前脚本的绝对路径
+ORIGINAL_SCRIPT="$( realpath "${BASH_SOURCE[0]}" )"
+# 设置根目录为当前脚本所在目录的上级目录
+ROOT_DIR=$( cd "$( dirname "${ORIGINAL_SCRIPT}" )/.." && pwd )
+DEV_MODE="false"
+GIT_PULL="true"
+FORCE_VERSION=""
+
+# 检查是否安装了 gsed，若没有则使用 sed
+if command -v gsed &> /dev/null
+then
+    SED="gsed"
+else
+    SED="sed"
+fi
+
+# 运行命令的函数
+run() {
+    if [ $DEV_MODE == "true" ]
+    then
+        echo "run: $@"
+    else
+        eval $@
+    fi
+}
+
+# 处理脚本参数
+ORIGINAL_ARGS="${@:2}"
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dev)
+            DEV_MODE="true"
+            shift
+        ;;
+        --version)
+            FORCE_VERSION=$2
+            shift
+            shift
+        ;;
+        --no-git-pull)
+            GIT_PULL="false"
+            shift
+        ;;
+        *)
+            POSITIONAL_ARGS+=("$1") 
+            shift
+        ;;
+    esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}"
+
+# 调用钩子函数
+call-hook() {
+    if [ -f "hooks/$1" ]
+    then
+        echo "运行钩子: $1"
+        bash hooks/$1
+    fi
+}
+
+# 运行 Docker Compose 命令
+run-docker-compose() {
+    if [ ! -f "docker-compose.yml" ]; then
+        echo '没有找到 docker-compose 文件。正在使用最新版本生成...'
+        latest_version=`get-latest-postal-version`
+        echo "最新版本是 $latest_version"
+        set-postal-version $latest_version
+    fi
+
+    if command -v docker-compose &> /dev/null
+    then
+        run "docker-compose -p postal $@"
+    else
+        run "docker compose -p postal $@"
+    fi
+}
+
+# 设置 Postal 的版本
+set-postal-version() {
+    desired_version=$1;
+
+    # 备份现有的 docker-compose 文件
+    if [ -f docker-compose.yml ]; then
+        cp docker-compose.yml docker-compose.backup.yml
+    fi
+
+    # 确定使用的版本（2 或 3）
+    if [[ $desired_version == 2* ]]; then
+        MAJOR_VERSION=2
+    else
+        MAJOR_VERSION=3
+    fi
+
+    # 复制新的 docker-compose 文件
+    cp templates/docker-compose.v$MAJOR_VERSION.yml docker-compose.yml
+
+    # 设置适当的工作进程数
+    if [ -f "worker-replicas" ]
+    then
+        worker_replicas=$(cat worker-replicas | tr -d " \n")
+    else
+        worker_replicas=1
+    fi
+
+    # 替换工作进程计数器
+    $SED -i "s/{{worker-replicas}}/$worker_replicas/" docker-compose.yml
+
+    # 替换版本字符串
+    $SED -i "s/{{version}}/$desired_version/" docker-compose.yml
+
+    call-hook "set-postal-version"
+}
+
+# 获取最新的 Postal 版本
+get-latest-postal-version() {
+
+    if ! command -v curl &> /dev/null
+    then
+        echo "未找到 curl。请安装 curl 后继续。" > /dev/stderr
+        return 1
+    fi
+
+    if ! command -v jq &> /dev/null
+    then
+        echo "未找到 jq。请安装 jq 后继续。" > /dev/stderr
+        return 1
+    fi
+
+    local response=`curl -s https://api.github.com/repos/postalserver/postal/releases/latest`
+
+    local error=`echo $response | jq -r '.message'`
+    if [[ "$error" == *"rate limit exceeded"* ]]; then
+        echo "GitHub API 访问限制超出。稍后再试。" > /dev/stderr
+        return 1
+    fi
+
+    local latest_version=`echo $response | jq -r '.tag_name'`
+    if [ "$latest_version" == "" ] || [ "$latest_version" == "null" ]; then
+        echo "无法从 GitHub 获取最新版本。请确保" > /dev/stderr
+        echo "已连接互联网且 GitHub 可用。" > /dev/stderr
+        return 1
+    fi
+
+    echo $latest_version
+}
+
+# 进入根目录
+cd $ROOT_DIR
+
+# 根据传入的命令执行相应操作
+case "$1" in
+    set-version)
+        if [ "$2" == "" ]; then
+            echo '版本号缺失。'
+            echo
+            echo '用法: postal set-version [x.x.x]'
+            exit 1
+        fi
+
+        set-postal-version "$2"
+        ;;
+
+    start)
+        call-hook "pre-start"
+        run-docker-compose "up -d ${@:2}"
+        call-hook "post-start"
+        ;;
+
+    stop)
+        call-hook "pre-stop"
+        run-docker-compose "down"
+        call-hook "post-stop"
+        ;;
+
+    restart)
+        call-hook "pre-restart"
+        run-docker-compose "restart"
+        call-hook "post-restart"
+        ;;
+
+    status)
+        run-docker-compose "ps"
+        ;;
+
+    logs)
+        run-docker-compose "logs ${@:2}"
+        ;;
+
+    dc)
+        run-docker-compose "${@:2}"
+        ;;
+
+    bash)
+        if [ "$2" == "" ]; then
+            echo '必须提供服务名称'
+            exit 1
+        fi
+
+        run-docker-compose "exec $2 bash"
+        ;;
+
+    initialize)
+        call-hook "pre-initialize-pull"
+        run-docker-compose "pull"
+        call-hook "pre-initialize"
+        run-docker-compose "run --rm runner postal initialize"
+        call-hook "post-initialize"
+        ;;
+
+    upgrade)
+        if [ $GIT_PULL == "true" ]
+        then
+            call-hook "pre-upgrade-pull"
+            echo '从 GitHub 拉取最新安装助手仓库...'
+            run "git pull origin"
+            call-hook "post-upgrade-pull"
+
+            echo '从拉取的仓库重新执行升级脚本'
+            eval "$0" "upgrade" "${ORIGINAL_ARGS}" --no-git-pull
+            exit $?
+        fi
+
+        # 获取要升级的最新 Postal 版本
+        if [ "$2" == "" ]; then
+            if [ ! $FORCE_VERSION == "" ]; then
+                latest_version="$FORCE_VERSION"
+                echo "使用版本: $latest_version"
+            else
+                echo '未指定版本，使用最新可用版本...'
+                latest_version=`get-latest-postal-version`
+            fi
+        else
+            latest_version="$2"
+        fi
+
+        set-postal-version $latest_version
+        echo "升级到 $latest_version"
+
+        call-hook "pre-upgrade-pull"
+        run-docker-compose "pull"
+        call-hook "pre-upgrade-db"
+        run-docker-compose "run --rm runner postal upgrade"
+        call-hook "post-upgrade-db"
+        run-docker-compose "up -d --remove-orphans"
+        call-hook "post-upgrade"
+        ;;
+
+    upgrade-db)
+        call-hook "pre-upgrade-db"
+        run-docker-compose "run --rm runner postal upgrade"
+        call-hook "post-upgrade-db"
+        ;;
+
+    console)
+        run-docker-compose "run --rm runner postal console"
+        ;;
+
+    version)
+        run-docker-compose "run --rm runner postal version"
+        ;;
+
+    make-user)
+        run-docker-compose "run --rm runner postal make-user"
+        ;;
+
+    default-dkim-record)
+        run-docker-compose "run --rm runner postal default-dkim-record"
+        ;;
+
+    test-app-smtp)
+        run-docker-compose "run --rm runner postal test-app-smtp $2"
+        ;;
+
+    bootstrap)
+        hostname=$2
+        output_path=$3
+
+        call-hook "pre-bootstrap"
+
+        if [ "$output_path" == "" ]; then
+            output_path=/opt/postal/config
+        fi
+
+        if [ "$hostname" == "" ]; then
+            echo '缺少主机名。'
+            echo
+            echo '用法: ./bin/postal postal.mydomain.com [path/to/config]'
+            exit 1
+        fi
+
+        # 获取最新的 Postal 版本作为新安装的起始版本
+        if [ ! $FORCE_VERSION == "" ]; then
+            latest_version="$FORCE_VERSION"
+            echo "使用版本: $latest_version"
+        else
+            latest_version=`get-latest-postal-version`
+            echo "最新版本是: $latest_version"
+        fi
+
+        set-postal-version $latest_version
+
+        if [[ $latest_version == 2* ]]; then
+            MAJOR_VERSION=2
+        else
+            MAJOR_VERSION=3
+        fi
+
+        mkdir -p $output_path
+
+        if [ ! -f $output_path/postal.yml ]; then
+            echo "=> 创建 $output_path/postal.yml"
+            cp examples/postal.v$MAJOR_VERSION.yml $output_path/postal.yml
+            rails_secret_key=`openssl rand -hex 128 | tr -d '\n'`
+            $SED -i "s/{{secretkey}}/$rails_secret_key/" $output_path/postal.yml
+            $SED -i "s/postal.yourdomain.com/$hostname/" $output_path/postal.yml
+        fi
+
+        if [ ! -f $output_path/Caddyfile ]; then
+            echo "=> 创建 $output_path/Caddyfile"
+            cp examples/Caddyfile $output_path/Caddyfile
+            $SED -i "s/postal.yourdomain.com/$hostname/" $output_path/Caddyfile
+        fi
+
+        if [ ! -f $output_path/signing.key ]; then
+            echo '=> 创建签名私钥'
+            openssl genrsa -out $output_path/signing.key 1024
+            chmod 644 $output_path/signing.key
+        fi
+
+        call-hook "post-bootstrap"
+
+        ;;
+    *)
+        echo "用法: postal [命令]"
+        echo
+        echo "运行 Postal:"
+        echo
+        echo -e " * \e[35mstart\e[0m - 启动 Postal"
+        echo -e " * \e[35mstop\e[0m - 停止 Postal"
+        echo -e " * \e[35mrestart\e[0m - 重启 Postal"
+        echo -e " * \e[35mstatus\e[0m - 查看当前进程状态"
+        echo -e " * \e[35mlogs [服务]\e[0m - 查看服务日志"
+        echo
+        echo "设置/升级工具:"
+        echo
+        echo -e " * \e[32minitialize\e[0m - 创建并加载 DB 模式"
+        echo -e " * \e[32mupgrade\e[0m - 升级 DB 模式"
+        echo
+        echo "其他工具:"
+        echo
+        echo -e " * \e[34mversion\e[0m - 显示当前 Postal 版本"
+        echo -e " * \e[34mmake-user\e[0m - 创建新的全局管理员用户"
+        echo -e " * \e[34mdefault-dkim-record\e[0m - 显示默认 DKIM 记录"
+        echo -e " * \e[34mconsole\e[0m - 打开交互式控制台"
+        echo -e " * \e[34mtest-app-smtp\e[0m - 通过 Postal 发送测试消息"
+        echo -e " * \e[34mbootstrap 主机名 [路径]\e[0m - 创建新的配置集"
+        echo -e " * \e[34mbash [服务]\e[0m - 访问正在运行的进程的 bash 控制台"
+        echo
+esac

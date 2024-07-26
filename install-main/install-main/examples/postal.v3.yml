@@ -1,0 +1,47 @@
+version: 2
+
+postal:
+  web_hostname: postal.yourdomain.com
+  web_protocol: https
+  smtp_hostname: postal.yourdomain.com
+
+main_db:
+  host: 127.0.0.1
+  username: domcsc
+  password: hzx19960426
+  database: postal
+
+message_db:
+  host: 127.0.0.1
+  username: domcsc
+  password: hzx19960426
+  prefix: postal
+
+smtp_server:
+  default_bind_address: "::"
+
+dns:
+# 指定您已配置的 DNS 记录。有关这些记录的详细信息，请参考文档：
+# https://github.com/atech/postal/wiki/Domains-&-DNS-Configuration
+
+  mx_records:
+    - mx.postal.yourdomain.com
+  spf_include: spf.postal.yourdomain.com
+  return_path_domain: rp.postal.yourdomain.com
+  route_domain: routes.postal.yourdomain.com
+  track_domain: track.postal.yourdomain.com
+
+smtp:
+# 指定一个SMTP服务器，用于从Postal管理系统向用户发送消息。
+# 您可以在安装完成后配置使用Postal邮件服务器。
+
+  host: 127.0.0.1
+  port: 2525
+  username: # 当postal运行时完成，您可以在界面内生成凭证。
+  password: 
+  from_name: Postal
+  from_address: postal@yourdomain.com
+
+rails:
+# 这是由配置初始化自动生成的。它应该是您的安装所独有的随机字符串。
+  secret_key: {{secretkey}}
