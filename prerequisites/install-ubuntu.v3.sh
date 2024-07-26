@@ -1,6 +1,9 @@
 #!/bin/bash
 
 # 此脚本将在 Ubuntu 上安装 Postal 的所有先决条件。
+# 它还将为您启动 MariaDB 容器。
+#
+# 重要提示：如果您将其用于产品，则应确保使用适合您的数据库服务的凭据。
 
 set -e
 
@@ -42,6 +45,12 @@ ln -s "$INSTALL_DIR/bin/postal" "$SYMLINK"
 sudo chmod +x "$INSTALL_DIR/bin/postal"
 echo "权限已执行完毕"
 
+# 删除现有的 MariaDB 容器（如果存在）
+if [ "$(docker ps -aq -f name=postal-mariadb)" ]; then
+  echo "现有的 MariaDB 容器存在，正在删除..."
+  docker rm -f postal-mariadb
+fi
+
 # 启动 MariaDB 容器
 docker run -d \
    --name postal-mariadb \
@@ -73,6 +82,12 @@ echo "数据库初始化完毕"
 
 postal start
 echo "开启 postal 服务成功"
+
+# 删除现有的 Caddy 容器（如果存在）
+if [ "$(docker ps -aq -f name=postal-caddy)" ]; then
+  echo "现有的 Caddy 容器存在，正在删除..."
+  docker rm -f postal-caddy
+fi
 
 # 启动 Caddy 容器
 docker run -d \
