@@ -29,12 +29,12 @@ INSTALL_DIR="/opt/postal/install"
 SYMLINK="/usr/bin/postal"
 
 if [ -d "$INSTALL_DIR" ]; then
-  echo "目标目录 $INSTALL_DIR 已存在，正在删除..."
+  echo -e "\e[35mstart\e[0m 目标目录 $INSTALL_DIR 已存在，正在删除..."
   rm -rf "$INSTALL_DIR"
 fi
 
 if [ -L "$SYMLINK" ]; then
-  echo "符号链接 $SYMLINK 已存在，正在删除..."
+  echo -e "\e[35mstart\e[0m 符号链接 $SYMLINK 已存在，正在删除..."
   rm "$SYMLINK"
 fi
 
@@ -43,11 +43,11 @@ git clone https://github.com/DOMGO-cut/postal.git "$INSTALL_DIR"
 ln -s "$INSTALL_DIR/bin/postal" "$SYMLINK"
 
 sudo chmod +x "$INSTALL_DIR/bin/postal"
-echo "权限已执行完毕"
+echo -e "\e[35mstart\e[0m 权限已执行完毕"
 
 # 删除现有的 MariaDB 容器（如果存在）
 if [ "$(docker ps -aq -f name=postal-mariadb)" ]; then
-  echo "现有的 MariaDB 容器存在，正在删除..."
+  echo -e "\e[35mstart\e[0m 现有的 MariaDB 容器存在，正在删除..."
   docker rm -f postal-mariadb
 fi
 
@@ -61,32 +61,32 @@ docker run -d \
    mariadb
 
 # 提示用户输入域名
-echo "请输入你的域名（例如: example.com）:"
+echo -e "\e[35mstart\e[0m 请输入你的域名（例如: example.com）:"
 read domain
 
 # 检查用户是否输入了域名
 if [ -z "$domain" ]; then
-  echo "缺少主机名。请确保输入一个有效的域名。"
+  echo -e "\e[35mstart\e[0m 缺少主机名。请确保输入一个有效的域名。"
   exit 1
 fi
 
 # 运行 postal bootstrap 命令
 postal bootstrap "$domain"
 
-echo "Postal bootstrap 已执行完毕，使用域名: $domain"
+echo -e "\e[35mstart\e[0m Postal bootstrap 已执行完毕，使用域名: $domain"
 
-echo "正在进行初始化数据库"
+echo -e "\e[35mstart\e[0m 正在进行初始化数据库"
 postal initialize
 
 postal make-user
-echo "数据库初始化完毕"
+echo -e "\e[35mstart\e[0m 数据库初始化完毕"
 
 postal start
-echo "开启 postal 服务成功"
+echo -e "\e[35mstart\e[0m 开启 postal 服务成功"
 
 # 删除现有的 Caddy 容器（如果存在）
 if [ "$(docker ps -aq -f name=postal-caddy)" ]; then
-  echo "现有的 Caddy 容器存在，正在删除..."
+  echo -e "\e[35mstart\e[0m 现有的 Caddy 容器存在，正在删除..."
   docker rm -f postal-caddy
 fi
 
@@ -99,4 +99,4 @@ docker run -d \
    -v /opt/postal/caddy-data:/data \
    caddy
 
-echo "安装完成，请打开网址访问 postal 服务，https://$domain"
+echo -e "\e[35mstart\e[0m 安装完成，请打开网址访问 postal 服务，https://$domain"
