@@ -26,7 +26,7 @@ main_db:
   host: 127.0.0.1
   username: root
   password: hzx19960426
-  database: domcsc
+  database: domcscs
 
 message_db:
   # Specify the connection details for your MySQL server that will house the
