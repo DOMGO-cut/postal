@@ -31,7 +31,7 @@ fi
 
 if [ -L "$SYMLINK" ]; then
   echo -e "\e[35mstart\e[0m 符号链接 $SYMLINK 已存在，正在删除..."
-  rm "$SYMLINK"
+  rm -rf "$SYMLINK"
 fi
 
 # 克隆 Postal 仓库
