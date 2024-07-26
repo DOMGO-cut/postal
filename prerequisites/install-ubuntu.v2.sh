@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# This script will install all the prerequisites for Postal on Ubuntu.
-# It will also start a MariaDB container for you. 
-#
-# IMPORTANT: If you are using this for product, you should ensure that you use 
-# appropriate credentials for your database services.
 
 set -e
 
