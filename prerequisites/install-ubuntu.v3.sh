@@ -63,10 +63,9 @@ echo ""
 # 检查用户是否输入了域名
 if [ -z "$domain" ]; then
   echo -e "\e[35mPostal 安装\e[0m 缺少主机名。请确保输入一个有效的域名。"
-  echo ""
   exit 1
 fi
-
+  echo ""
 # 运行 postal bootstrap 命令
 postal bootstrap "$domain"
 
