@@ -128,6 +128,6 @@ echo -e "\e[35mPostal 安装\e[0m SPF记录为：   rp   TXT  v=spf1 a mx includ
 
 echo -e "\e[35mPostal 安装\e[0m SPF记录为：   spf  TXT  v=spf1 ip4:$ips   ip6:$ipss ~all"
 
-echo -e "\e[35mPostal 安装\e[0m DKIM记录为：  postal.default._domainkey.rp      $DKIM"
+echo -e "\e[35mPostal 安装\e[0m DKIM记录为：  default._domainkey.rp      $DKIM"
 
 
