@@ -53,7 +53,7 @@ docker run -d \
    -p 127.0.0.1:3306:3306 \
    --restart always \
    -e MARIADB_DATABASE=postal \
-   -e MARIADB_ROOT_PASSWORD=hzx19960426 \
+   -e MARIADB_ROOT_PASSWORD=domcsc1985 \
    mariadb
 
 # 提示用户输入域名
