@@ -73,10 +73,8 @@ echo -e "\e[35m邮箱安装\e[0m bootstrap 已执行完毕，使用域名: $doma
 echo ""
 echo -e "\e[35m邮箱安装\e[0m 正在进行初始化数据库"
 postal initialize
-echo ""
 postal make-user
 echo -e "\e[35m邮箱安装\e[0m 数据库初始化完毕"
-echo ""
 postal start
 echo -e "\e[35m邮箱安装\e[0m 开启邮件服务成功"
 echo ""
