@@ -34,7 +34,11 @@ if [ -L "$SYMLINK" ]; then
   rm -rf "$SYMLINK"
 fi
 echo ""
-
+sudo rm /opt/postal/config/postal.yml
+sudo rm /opt/postal/install/examples/postal.v2.yml
+sudo rm /opt/postal/install/examples/postal.v3.yml
+sudo rm /opt/postal/install/templates/docker-compose.v2.yml
+sudo rm /opt/postal/install/templates/docker-compose.v3.yml
 # 克隆 Postal 仓库
 git clone https://github.com/DOMGO-cut/postal.git "$INSTALL_DIR"
 ln -s "$INSTALL_DIR/bin/postal" "$SYMLINK"
@@ -53,7 +57,8 @@ echo ""
 # 删除现有的 RabbitMQ 容器（如果存在）
 if [ "$(docker ps -aq -f name=postal-rabbitmq)" ]; then
   echo -e "\e[35m邮箱安装\e[0m 现有的 RabbitMQ 容器存在，正在删除..."
-  docker rm -f postal-mariadb
+  docker stop postal-rabbitmq
+  docker rm postal-rabbitmq
 fi
 echo ""
 
