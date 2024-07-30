@@ -72,7 +72,7 @@ docker run -d \
    --name postal-rabbitmq \
    -p 127.0.0.1:5672:5672 \
    --restart always \
-   -e RABBITMQ_DEFAULT_USER=domcsc \
+   -e RABBITMQ_DEFAULT_USER=root \
    -e RABBITMQ_DEFAULT_PASS=domcsc1985 \
    -e RABBITMQ_DEFAULT_VHOST=postal \
    rabbitmq:3.8
