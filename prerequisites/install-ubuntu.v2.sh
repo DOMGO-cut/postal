@@ -34,11 +34,7 @@ if [ -L "$SYMLINK" ]; then
   rm -rf "$SYMLINK"
 fi
 echo ""
-sudo rm /opt/postal/config/postal.yml
-sudo rm /opt/postal/install/examples/postal.v2.yml
-sudo rm /opt/postal/install/examples/postal.v3.yml
-sudo rm /opt/postal/install/templates/docker-compose.v2.yml
-sudo rm /opt/postal/install/templates/docker-compose.v3.yml
+
 # 克隆 Postal 仓库
 git clone https://github.com/DOMGO-cut/postal.git "$INSTALL_DIR"
 ln -s "$INSTALL_DIR/bin/postal" "$SYMLINK"
