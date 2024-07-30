@@ -40,7 +40,7 @@ message_db:
 rabbitmq:
   # 指定RabbitMQ服务器的连接详情
   host: 127.0.0.1
-  username: domcsc
+  username: root
   password: domcsc1985
   vhost: postal
 
