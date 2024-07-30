@@ -3,7 +3,8 @@ postal:
   web_hostname: postal.yourdomain.com
   web_protocol: https
   smtp_hostname: postal.yourdomain.com
-
+  use_ip_pools: true
+  
 main_db:
   host: 127.0.0.1
   username: root
