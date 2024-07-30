@@ -35,6 +35,15 @@ if [ -L "$SYMLINK" ]; then
 fi
 echo ""
 
+# 克隆 Postal 仓库
+git clone https://github.com/DOMGO-cut/postal.git "$INSTALL_DIR"
+ln -s "$INSTALL_DIR/bin/postal" "$SYMLINK"
+
+sudo chmod +x "$INSTALL_DIR/bin/postal"
+echo -e "\e[35m邮箱安装\e[0m 权限已执行完毕"
+echo ""
+
+
 # 删除现有的 MariaDB 容器（如果存在）
 if [ "$(docker ps -aq -f name=postal-mariadb)" ]; then
   echo -e "\e[35m邮箱安装\e[0m 现有的 MariaDB 容器存在，正在删除..."
