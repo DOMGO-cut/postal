@@ -1,3 +1,5 @@
+version: 2
+
 general:
   # 这可以更改以允许从多个IP地址发送消息
   use_ip_pools: true
