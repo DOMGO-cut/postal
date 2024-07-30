@@ -1,52 +1,49 @@
 general:
-  # This can be changed to allow messages to be sent from multiple IP addresses
-  use_ip_pools: false
+  # 这可以更改以允许从多个IP地址发送消息
+  use_ip_pools: true
 
 web:
-  # The host that the management interface will be available on
+  # 管理界面将可用的主机
   host: postal.yourdomain.com
-  # The protocol that requests to the management interface should happen on
+  # 管理界面请求应使用的协议
   protocol: https
 
 web_server:
-  # Specify configuration for the Postal web server
+  # 指定Postal Web服务器的配置
   bind_address: 127.0.0.1
   port: 5000
 
 smtp_server:
-  # Specify configuration to the Postal SMTP server
+  # 指定Postal SMTP服务器的配置
   port: 25
 
 logging:
-  # Specify options for the logging
+  # 指定日志选项
   stdout: true
 
 main_db:
-  # Specify the connection details for your MySQL database
+  # 指定MySQL数据库的连接详情
   host: 127.0.0.1
   username: root
-  password: postal
+  password: domcsc1985
   database: postal
 
 message_db:
-  # Specify the connection details for your MySQL server that will house the
-  # message databases for mail servers.
+  # 指定将用于邮件服务器消息数据库的MySQL服务器的连接详情
   host: 127.0.0.1
   username: root
-  password: postal
+  password: domcsc1985
   prefix: postal
 
 rabbitmq:
-  # Specify connection details for your RabbitMQ server
+  # 指定RabbitMQ服务器的连接详情
   host: 127.0.0.1
-  username: postal
-  password: postal
+  username: domcsc
+  password: domcsc1985
   vhost: postal
 
 dns:
-  # Specify the DNS records that you have configured. Refer to the documentation at
-  # https://docs.postalserver.io/install/dns-configuration for further information
-  # about these.
+  # 指定您已配置的DNS记录。有关这些记录的更多信息，请参阅文档 https://docs.postalserver.io/install/dns-configuration
   mx_records:
     - mx.postal.yourdomain.com
   smtp_server_hostname: postal.yourdomain.com
@@ -56,17 +53,14 @@ dns:
   track_domain: track.postal.yourdomain.com
 
 smtp:
-  # Specify an SMTP server that can be used to send messages from the Postal management
-  # system to users. You can configure this to use a Postal mail server once the
-  # your installation has been set up.
+  # 指定一个SMTP服务器，可用于从Postal管理系统向用户发送消息。您可以在安装设置完成后配置此项以使用Postal邮件服务器。
   host: 127.0.0.1
   port: 2525
-  username: # Complete when Postal is running and you can
-  password: # generate the credentials within the interface.
+  username: # 当Postal运行并可以在界面内生成凭据时填写
+  password: # 当Postal运行并可以在界面内生成凭据时填写
   from_name: Postal
   from_address: postal@yourdomain.com
 
 rails:
-  # This is generated automatically by the config initialization. It should be a random
-  # string unique to your installation.
+  # 这由配置初始化自动生成。它应该是唯一的随机字符串。
   secret_key: {{secretkey}}
