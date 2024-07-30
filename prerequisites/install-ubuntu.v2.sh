@@ -1,33 +1,52 @@
 #!/bin/bash
 
-# This script will install all the prerequisites for Postal on Ubuntu.
-# It will also start a MariaDB container for you. 
-#
-# IMPORTANT: If you are using this for product, you should ensure that you use 
-# appropriate credentials for your database services.
 
 set -e
 
-# Add Docker's official GPG key:
+# 添加 Docker 的官方 GPG 密钥：
 apt-get update
 apt-get install -y ca-certificates curl git jq
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
 
-# Add the repository to Apt sources:
+# 将存储库添加到 Apt 源：
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   tee /etc/apt/sources.list.d/docker.list > /dev/null
 apt-get update
 
-# Install docker
+# 安装 Docker
 apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Install helper
-git clone https://postalserver.io/start/install /opt/postal/install
-ln -s /opt/postal/install/bin/postal /usr/bin/postal
+# 检查并删除现有目录和符号链接
+INSTALL_DIR="/opt/postal/install"
+SYMLINK="/usr/bin/postal"
+
+if [ -d "$INSTALL_DIR" ]; then
+  echo -e "\e[35m邮箱安装\e[0m 目标目录 $INSTALL_DIR 已存在，正在删除..."
+  rm -rf "$INSTALL_DIR"
+fi
+echo ""
+if [ -L "$SYMLINK" ]; then
+  echo -e "\e[35m邮箱安装\e[0m 符号链接 $SYMLINK 已存在，正在删除..."
+  rm -rf "$SYMLINK"
+fi
+echo ""
+
+# 删除现有的 MariaDB 容器（如果存在）
+if [ "$(docker ps -aq -f name=postal-mariadb)" ]; then
+  echo -e "\e[35m邮箱安装\e[0m 现有的 MariaDB 容器存在，正在删除..."
+  docker rm -f postal-mariadb
+fi
+echo ""
+# 删除现有的 RabbitMQ 容器（如果存在）
+if [ "$(docker ps -aq -f name=postal-rabbitmq)" ]; then
+  echo -e "\e[35m邮箱安装\e[0m 现有的 RabbitMQ 容器存在，正在删除..."
+  docker rm -f postal-mariadb
+fi
+echo ""
 
 # Run MariaDB
 docker run -d \
@@ -35,7 +54,7 @@ docker run -d \
    -p 127.0.0.1:3306:3306 \
    --restart always \
    -e MARIADB_DATABASE=postal \
-   -e MARIADB_ROOT_PASSWORD=postal \
+   -e MARIADB_ROOT_PASSWORD=domcsc1985 \
    mariadb
 
 # Run RabbitMQ
@@ -43,7 +62,80 @@ docker run -d \
    --name postal-rabbitmq \
    -p 127.0.0.1:5672:5672 \
    --restart always \
-   -e RABBITMQ_DEFAULT_USER=postal \
-   -e RABBITMQ_DEFAULT_PASS=postal \
+   -e RABBITMQ_DEFAULT_USER=domcsc \
+   -e RABBITMQ_DEFAULT_PASS=domcsc1985 \
    -e RABBITMQ_DEFAULT_VHOST=postal \
    rabbitmq:3.8
+   
+# 提示用户输入域名
+echo -e "\e[35m邮箱安装\e[0m   请输入你的域名（例如: example.com）:"
+read domain
+
+# 检查用户是否输入了域名
+if [ -z "$domain" ]; then
+  echo -e "\e[35m邮箱安装\e[0m 缺少主机名。请确保输入一个有效的域名。"
+  exit 1
+fi
+
+# 运行 postal bootstrap 命令
+postal bootstrap "$domain"
+echo ""
+echo -e "\e[35m邮箱安装\e[0m bootstrap 已执行完毕，使用域名: $domain"
+echo ""
+echo -e "\e[35m邮箱安装\e[0m 正在进行初始化数据库"
+postal initialize
+postal make-user
+echo -e "\e[35m邮箱安装\e[0m 数据库初始化完毕"
+postal start
+echo -e "\e[35m邮箱安装\e[0m 开启邮件服务成功"
+echo ""
+# 删除现有的 Caddy 容器（如果存在）
+if [ "$(docker ps -aq -f name=postal-caddy)" ]; then
+  echo -e "\e[35m邮箱安装\e[0m 现有的 Caddy 容器存在，正在删除..."
+  echo ""
+  docker rm -f postal-caddy
+fi
+
+# 启动 Caddy 容器
+docker run -d \
+   --name postal-caddy \
+   --restart always \
+   --network host \
+   -v /opt/postal/config/Caddyfile:/etc/caddy/Caddyfile \
+   -v /opt/postal/caddy-data:/data \
+   caddy
+   
+# 获取当前的 IPv4 地址
+ipv4=$(curl -s https://api64.ipify.org)
+
+
+# 将结果赋值给变量
+ips="$ipv4"
+
+echo ""
+echo -e "\e[35m邮箱安装\e[0m   安装完成，请打开网址访问群发后台! \e[31m        https://$domain \e[0m"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置A记录为： \e[32m       @  \e[0m       \e[31m A  \e[0m       $ips"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置MX记录为：   \e[32m    @ \e[0m     \e[31m   MX   10 \e[0m mx.$domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置SPF记录为：   \e[32m   @ \e[0m    \e[31m    TXT \e[0m   v=spf1 a mx include:spf.$domain ~all"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置A记录为：      \e[32m track \e[0m  \e[31m    A \e[0m        $ips"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置MX记录为：   \e[32m    rp \e[0m      \e[31m MX   10 \e[0m  $domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置返回MX记录为：\e[32m  routes \e[0m  \e[31m   MX   10 \e[0m  $domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置DMARC记录为： \e[32m  _dmarc \e[0m \e[31m   TXT \e[0m   v=DMARC1;p=quarantine;rua=mailto:admin@$domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置SPF记录为：   \e[32m  rp \e[0m    \e[31m    TXT \e[0m   v=spf1 a mx include:spf.$domain ~all"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置SPF记录为：   \e[32m  spf \e[0m    \e[31m   TXT \e[0m   v=spf1 ip4:$ips  ~all"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置SPF记录为：   \e[32m   @ \e[0m    \e[31m    TXT \e[0m   v=spf1 ip4:$ips  ~all"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置CNAM记录为：  \e[32m  psrp  \e[0m  \e[31m   CNAM \e[0m  rp.$domain"
+echo ""
+echo -e "\e[35mDNS配置\e[0m   设置CNAM记录为：  \e[32m  click \e[0m  \e[31m   CNAM \e[0m  track.$domain"
+echo ""
