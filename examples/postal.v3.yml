@@ -8,10 +8,10 @@ postal:
   default_maximum_delivery_attempts: 2
 
 worker:
-  threads: 10
+  threads: 8
 
 web_server:
-  max_threads: 10
+  max_threads: 8
   
 main_db:
   host: 127.0.0.1
