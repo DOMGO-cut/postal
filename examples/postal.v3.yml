@@ -1,3 +1,4 @@
+version: 2
 
 postal:
   web_hostname: postal.yourdomain.com
